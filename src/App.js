@@ -12,36 +12,46 @@ function App() {
   const [completedTodos, setCompletedTodos] = useState([]);
   const [inProgressTodos, setInProgressTodos] = useState([]);
   const [todos, setTodos] = useState([]); // Initialize todos as an empty array
-  const [loading, setLoading] = useState(true); // Initialize loading as true
+  // const [loading, setLoading] = useState(true); // Initialize loading as true
   const currentTime = new Date().getTime();
   const [allTodos, setAllTodos] = useState(() => {
     const storedTodos = localStorage.getItem("todolist");
     return storedTodos ? JSON.parse(storedTodos) : [];
   });
-  const handleAddTodo = () => {
-    console.log(currentTime);
-    let newTodoItem = {
-      title: newTitle,
-      description: newDescription,
-      createdOn: currentTime,
-      characterId: 1,
-    };
+  const [users, setUsers] = useState([]);
+  const [usedUserIds, setUsedUserIds] = useState([]);
 
-    setAllTodos([...allTodos, newTodoItem]);
-    // console.log(allTodos);
-    localStorage.setItem(
-      "todolist",
-      JSON.stringify([...allTodos, newTodoItem])
-    );
-    setNewTitle("");
-    setNewDescription("");
-  };
+  const handleAddTodo = async () => {
+    if (newTitle.trim() === "") {
+      // Check if the title is empty or contains only whitespace
+      alert("Title cannot be empty");
+      return;
+    }
 
-  const handleDeleteTodo = (index) => {
-    let reducedTodo = [...allTodos];
-    reducedTodo.splice(index, 1);
-    localStorage.setItem("todolist", JSON.stringify(reducedTodo));
-    setAllTodos(reducedTodo);
+    const user = await fetchUserForTask(allTodos.length + 1); // Get a user for the new task
+
+    if (user) {
+      let newTodoItem = {
+        title: newTitle,
+        description: newDescription,
+        createdOn: currentTime,
+        user: user, // Include the user in the task data
+      };
+
+      setAllTodos((prevTodos) => [...prevTodos, newTodoItem]);
+
+      // Update localStorage after the state has been updated
+      localStorage.setItem(
+        "todolist",
+        JSON.stringify([...allTodos, newTodoItem])
+      );
+
+      setNewTitle("");
+      setNewDescription("");
+    } else {
+      // Handle the case where fetching a user failed
+      // You can display an error message or handle it as needed
+    }
   };
 
   const handleDeleteCompleted = (index) => {
@@ -94,6 +104,14 @@ function App() {
     );
   };
 
+  const handleDeleteTodo = (index) => {
+    let updatedTodoList = [...allTodos];
+    updatedTodoList.splice(index, 1);
+
+    setAllTodos(updatedTodoList);
+    localStorage.setItem("todolist", JSON.stringify(updatedTodoList));
+  };
+
   const handleComplete = (index, section) => {
     let filteredItem;
     switch (section) {
@@ -125,49 +143,37 @@ function App() {
         break;
     }
   };
-
   const handleRemoveExpiredTasks = () => {
-    // Calculate the timestamp for 24 hours ago
-    // console.log("current time", currentTime);
-    const twentyFourHoursAgo = currentTime - 240000; // 24 hours in milliseconds
-    // console.log(typeof twentyFourHoursAgo);
-    // Filter tasks in Todo section
-    console.log("list before filter:", allTodos);
-    if (allTodos.length != 0) {
+    if (selectedScreen === "Todo") {
+      // Calculate the timestamp for 24:15 of the next day (12:15 AM of the next day)
+      const endOfNextDay = new Date();
+      endOfNextDay.setDate(endOfNextDay.getDate() + 1); // Move to the next day
+      endOfNextDay.setHours(24, 15, 0, 0); // Set to 24:15
+
+      const endOfNextDayTimestamp = endOfNextDay.getTime();
+
+      console.log("Current Time:", currentTime);
+      console.log("End of Next Day Timestamp:", endOfNextDayTimestamp);
+
+      // Filter tasks in Todo section
       const updatedTodoList = allTodos.filter((item) => {
-        console.log("item.createdOn:", item.createdOn);
-        console.log("twentyFourHoursAgo:", twentyFourHoursAgo);
-        if (item.createdOn <= twentyFourHoursAgo) {
-          // Keep tasks that are not completed and are older than 24 hours
-          console.log("statement is true");
-          return true;
+        if (!item.completed && item.createdOn <= endOfNextDayTimestamp) {
+          console.log("Removing Todo:", item);
+          return false;
         }
-        console.log("statement isnt true");
-        return false;
+        return true;
       });
 
-      // Filter tasks in In Progress section
-      const updatedInProgressList = inProgressTodos.filter((item) => {
-        if (!item.completed && item.createdOn <= twentyFourHoursAgo) {
-          // Keep tasks that are not completed and are older than 24 hours
-          return true;
-        }
-        return false;
-      });
+      console.log("Updated Todo List:", updatedTodoList);
 
-      // Set the updated lists and save them to localStorage
+      // Set the updated list and save it to localStorage
       setAllTodos(updatedTodoList);
-      setInProgressTodos(updatedInProgressList);
-
-      // Update localStorage for both lists
       localStorage.setItem("todolist", JSON.stringify(updatedTodoList));
-      localStorage.setItem(
-        "inProgressTodos",
-        JSON.stringify(updatedInProgressList)
-      );
     }
   };
 
+  // Call handleRemoveExpiredTasks when the component mounts and when the selectedScreen changes to "Todo"
+
   useEffect(() => {
     const savedTodo = JSON.parse(localStorage.getItem("todolist"));
     const savedInProgress = JSON.parse(localStorage.getItem("inProgressTodos"));
@@ -185,56 +191,52 @@ function App() {
     if (savedCompletedTodo) {
       setCompletedTodos(savedCompletedTodo);
     }
-
-    //api
-
-    // Set up a timer to periodically check and remove tasks
-    const timer = setInterval(() => {
-      handleRemoveExpiredTasks();
-    }, 6000); // Check every minute
-
-    return () => clearInterval(timer); // Clear the timer on component unmount
   }, []);
 
-  useEffect(() => {
-    const savedTodo = JSON.parse(localStorage.getItem("todolist"));
-    const savedInProgress = JSON.parse(localStorage.getItem("inProgressTodos"));
-    const savedCompletedTodo = JSON.parse(
-      localStorage.getItem("completedTodos")
+  const fetchUserForTask = async (taskId) => {
+    try {
+      const response = await axios.get(
+        `https://swapi.dev/api/people/${taskId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching user for task ${taskId}:`, error);
+      return null;
+    }
+  };
+
+  // Function to attach a random user to a task
+  const attachRandomUserToTask = (task) => {
+    const availableUsers = users.filter(
+      (user) => !usedUserIds.includes(user.id)
     );
 
-    if (savedTodo) {
-      setAllTodos(savedTodo);
+    if (availableUsers.length === 0) {
+      // Reset usedUserIds when all users have been assigned
+      setUsedUserIds([]);
     }
 
-    if (savedInProgress) {
-      setInProgressTodos(savedInProgress);
-    }
-    if (savedCompletedTodo) {
-      setCompletedTodos(savedCompletedTodo);
-    }
-    const fetchDataForTodos = async () => {
-      const updatedTodos = await Promise.all(
-        allTodos.map(async (todo) => {
-          try {
-            const response = await axios.get(
-              `https://swapi.dev/api/people/${todo.characterId}`
-            );
-            return { ...todo, characterData: response.data };
-          } catch (error) {
-            console.error(
-              `Error fetching data for task ${todo.characterId}:`,
-              error
-            );
-            return todo;
-          }
-        })
-      );
-      setAllTodos(updatedTodos);
-      setLoading(false);
+    const randomUser =
+      availableUsers[Math.floor(Math.random() * availableUsers.length)];
+    setUsedUserIds((prevUsedUserIds) => [...prevUsedUserIds, randomUser.id]);
+
+    return { ...task, user: randomUser };
+  };
+
+  //api
+  useEffect(() => {
+    // Fetch users from the API when the component mounts
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("https://swapi.dev/api/people");
+        setUsers(response.data.results);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     };
-    fetchDataForTodos();
-  }, [allTodos]);
+
+    fetchUsers();
+  }, []);
 
   return (
     <div className="App">
@@ -309,12 +311,7 @@ function App() {
                     <div>
                       <h3>{item.title}</h3>
                       <p>{item.description}</p>
-                      <p>{item.createdOn}</p>
-                      <ul>
-                        {todos.map((todo, index) => (
-                          <li key={index}>{todo.name}</li>
-                        ))}
-                      </ul>
+                      <p>User: {item.user ? item.user.name : "Unknown"}</p>{" "}
                     </div>
                     <div>
                       <AiOutlineDelete
@@ -344,13 +341,9 @@ function App() {
                       <h3>{item.title}</h3>
                       <p>{item.description}</p>
                       <p>
-                        <small>Completed on: {item.completedOn}</small>
+                        <small>Completed on: {item.createdOn}</small>
                       </p>
-                      <ul>
-                        {todos.map((todo, index) => (
-                          <li key={index}>{todo.name}</li>
-                        ))}
-                      </ul>
+                      <p>User: {item.user ? item.user.name : "Unknown"}</p>{" "}
                     </div>
                     <div>
                       <AiOutlineDelete
@@ -375,6 +368,7 @@ function App() {
                           <li key={index}>{todo.name}</li>
                         ))}
                       </ul>
+                      <p>User: {item.user ? item.user.name : "Unknown"}</p>{" "}
                     </div>
                     <div>
                       <AiOutlineDelete

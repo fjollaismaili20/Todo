@@ -1,8 +1,8 @@
 /* Global styles */
 body {
-  background-color: #f0f0f0; /* Light gray background */
-  color: #333; /* Dark text color */
-  font-family: Arial, sans-serif; /* Choose a suitable font */
+  background-color: #eae0cc; /* Light gray background */
+  color: #4d6a6d; /* Dark text color */
+  font-family: "Roboto", sans-serif; /* Choose a suitable font */
   margin: 0;
   padding: 0;
 }
@@ -10,126 +10,141 @@ body {
 /* Center align the heading */
 h1 {
   text-align: center;
-  color: #555; /* Dark gray heading color */
+  color: #4d6a6d; /* Orange heading color */
   margin-top: 20px;
+  font-size: 2rem;
+  margin-bottom: 20px; /* Add space below heading */
 }
 
 /* Todo wrapper */
 .todo-wrapper {
-  background: #fff; /* White background */
+  background: #afd5aa; /* White background */
   padding: 2%;
   width: 80%; /* Use a percentage for responsiveness */
   margin: 30px auto; /* Center the container */
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
-  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  border-radius: 15px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+  margin-bottom: 30px; /* Add space below the container */
+}
+.btn-area {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 /* Todo input form */
 .todo-input {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #ccc; /* Light gray border */
-  padding-bottom: 15px;
-  margin-bottom: 15px;
+  justify-content: center;
+  gap: 40px;
+  /* border-bottom: 2px solid #a0a083; Orange border */
+  padding-bottom: 20px; /* Increase space below input form */
+  margin-bottom: 20px; /* Add more space below input form */
 }
 
 /* Todo input items */
-.todo-input-item {
-  display: flex;
-  flex-direction: column;
-}
+/*  */
 
 .todo-input-item label {
   font-weight: bold;
-  margin-bottom: 5px; /* Smaller margin */
+  margin-bottom: 10px; /* Increase space below labels */
+  color: #4d6a6d; /* Orange label color */
 }
 
 .todo-input-item input {
-  padding: 8px;
-  border: 1px solid #ccc; /* Light gray border */
-  width: 250px;
+  padding: 10px; /* Increase padding */
+  border: 2px solid #a0a083; /* Orange border */
+  width: 100%; /* Full-width input */
   border-radius: 5px; /* Slight border radius */
+  transition: border-color 0.3s ease; /* Smooth border color transition */
 }
 
 .todo-input-item input:focus {
   outline: none;
-  border: 1px solid #007bff; /* Blue border on focus */
+  border: 2px solid #a0a083; /* Orange border on focus */
 }
 
 /* Primary and Secondary buttons */
 .primaryBtn,
 .secondaryBtn {
-  background-color: #007bff; /* Blue primary color */
+  background-color: #4d6a6d; /* Orange primary color */
   color: #fff; /* White text color */
   border: none;
   border-radius: 5px;
-  margin-top: 15px;
-  padding: 10px 20px; /* More padding horizontally */
+  margin-top: 20px; /* Increase space above buttons */
+  padding: 12px 24px; /* Increase padding */
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth background color transition */
+  text-transform: uppercase; /* Uppercase button text */
+  font-weight: bold; /* Bold button text */
 }
 
 .secondaryBtn {
-  background-color: #555; /* Dark gray secondary color */
-  margin-left: 10px; /* Add some space between buttons */
+  background-color: #4d6a6d; /* Indigo secondary color */
+  margin-left: 15px; /* Add more space between buttons */
 }
 
 .primaryBtn:hover,
 .secondaryBtn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #798478; /* Darker orange on hover */
 }
 
 /* Todo list */
 .todo-list {
-  display: flex;
-  flex-direction: column;
+  list-style: none; /* Remove default list style */
+  padding: 0; /* Remove default list padding */
 }
 
 /* Todo list item */
 .todo-list-item {
   background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  padding: 15px;
+  border: 2px solid #a0a083;
+  border-radius: 10px; /* Rounded corners */
+  margin-bottom: 20px; /* Add more space below list items */
+  padding: 20px; /* Increase padding */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease; /* Smooth item transform on hover */
+}
+
+.todo-list-item:hover {
+  transform: scale(1.02); /* Slight scale-up on hover */
 }
 
 .todo-list h3 {
   font-size: 20px;
-  color: #007bff; /* Blue heading color */
+  color: #a0a083; /* Orange heading color */
   font-weight: bold;
   margin: 0;
+  text-transform: uppercase; /* Capitalize task titles */
 }
 
 .todo-list-item p {
   font-size: 14px;
-  color: #777; /* Dark gray text color */
-  margin-top: 5px; /* Smaller margin */
+  color: #555; /* Dark gray text color */
+  margin-top: 10px; /* Increase space above text */
 }
 
 /* Icons */
 .icon {
   font-size: 25px;
   cursor: pointer;
-  color: #007bff; /* Blue icon color */
+  color: #a0a083; /* Orange icon color */
+  transition: color 0.3s ease; /* Smooth color transition on hover */
+  margin-right: 10px; /* Add space between icon and text */
 }
 
 .icon:hover {
-  color: #f00; /* Red on hover */
+  color: #3581b8; /* Indigo on hover */
 }
 
 .check-icon {
   font-size: 20px;
-  margin-left: 10px;
-  color: #007bff; /* Blue check icon color */
-}
-
-.check-icon:hover {
-  color: #0056b3; /* Darker blue on hover */
+  margin-left: 15px; /* Add more space between check icon and text */
+  color: #a0a083; /* Orange check icon color */
+  transition: color 0.3s ease; /* Smooth color transition on hover */
 }
