@@ -11,7 +11,7 @@ function App() {
   const [newDescription, setNewDescription] = useState([]);
   const [completedTodos, setCompletedTodos] = useState([]);
   const [inProgressTodos, setInProgressTodos] = useState([]);
-  const [todos, setTodos] = useState([]); // Initialize todos as an empty array
+  const [todos, setTodos] = useState([]);
   // const [loading, setLoading] = useState(true); // Initialize loading as true
   const currentTime = new Date().getTime();
   const [allTodos, setAllTodos] = useState(() => {
@@ -23,24 +23,22 @@ function App() {
 
   const handleAddTodo = async () => {
     if (newTitle.trim() === "") {
-      // Check if the title is empty or contains only whitespace
       alert("Title cannot be empty");
       return;
     }
 
-    const user = await fetchUserForTask(allTodos.length + 1); // Get a user for the new task
+    const user = await fetchUserForTask(allTodos.length + 1);
 
     if (user) {
       let newTodoItem = {
         title: newTitle,
         description: newDescription,
         createdOn: currentTime,
-        user: user, // Include the user in the task data
+        user: user,
       };
 
       setAllTodos((prevTodos) => [...prevTodos, newTodoItem]);
 
-      // Update localStorage after the state has been updated
       localStorage.setItem(
         "todolist",
         JSON.stringify([...allTodos, newTodoItem])
@@ -49,8 +47,6 @@ function App() {
       setNewTitle("");
       setNewDescription("");
     } else {
-      // Handle the case where fetching a user failed
-      // You can display an error message or handle it as needed
     }
   };
 
@@ -145,17 +141,15 @@ function App() {
   };
   const handleRemoveExpiredTasks = () => {
     if (selectedScreen === "Todo") {
-      // Calculate the timestamp for 24:15 of the next day (12:15 AM of the next day)
       const endOfNextDay = new Date();
-      endOfNextDay.setDate(endOfNextDay.getDate() + 1); // Move to the next day
-      endOfNextDay.setHours(24, 15, 0, 0); // Set to 24:15
+      endOfNextDay.setDate(endOfNextDay.getDate() + 1);
+      endOfNextDay.setHours(23, 59, 59, 999);
 
       const endOfNextDayTimestamp = endOfNextDay.getTime();
 
       console.log("Current Time:", currentTime);
       console.log("End of Next Day Timestamp:", endOfNextDayTimestamp);
 
-      // Filter tasks in Todo section
       const updatedTodoList = allTodos.filter((item) => {
         if (!item.completed && item.createdOn <= endOfNextDayTimestamp) {
           console.log("Removing Todo:", item);
@@ -166,13 +160,10 @@ function App() {
 
       console.log("Updated Todo List:", updatedTodoList);
 
-      // Set the updated list and save it to localStorage
       setAllTodos(updatedTodoList);
       localStorage.setItem("todolist", JSON.stringify(updatedTodoList));
     }
   };
-
-  // Call handleRemoveExpiredTasks when the component mounts and when the selectedScreen changes to "Todo"
 
   useEffect(() => {
     const savedTodo = JSON.parse(localStorage.getItem("todolist"));
@@ -205,14 +196,12 @@ function App() {
     }
   };
 
-  // Function to attach a random user to a task
   const attachRandomUserToTask = (task) => {
     const availableUsers = users.filter(
       (user) => !usedUserIds.includes(user.id)
     );
 
     if (availableUsers.length === 0) {
-      // Reset usedUserIds when all users have been assigned
       setUsedUserIds([]);
     }
 
@@ -225,7 +214,6 @@ function App() {
 
   //api
   useEffect(() => {
-    // Fetch users from the API when the component mounts
     const fetchUsers = async () => {
       try {
         const response = await axios.get("https://swapi.dev/api/people");
@@ -348,7 +336,7 @@ function App() {
                     <div>
                       <AiOutlineDelete
                         className="icon"
-                        onClick={() => handleDeleteCompleted(index)} // Use the new function
+                        onClick={() => handleDeleteCompleted(index)}
                         title="Delete?"
                       />
                     </div>
